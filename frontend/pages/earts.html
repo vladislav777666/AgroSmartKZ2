@@ -1,4 +1,30 @@
-<h2>Почвы региона</h2>
-<div id="soil-box">Загрузка...</div>
+<h2>Анализ почвы — версия 2</h2>
 
-<div class="card" onclick="navigate('main')">⬅️ Назад</div>
+<div class="card">
+    <div id="district-info" style="margin-bottom:8px;color:#333;"></div>
+    <form id="soil-form">
+        <div style="display:flex;gap:8px;flex-wrap:wrap;">
+            <label>pH: <input id="inp-ph" type="number" step="0.1" min="3.0" max="9.0" value="6.5" /></label>
+            <label>Органика (%) : <input id="inp-organic" type="number" step="0.1" min="0" max="40" value="5" /></label>
+            <label>Влажность (%) : <input id="inp-moisture" type="number" step="0.1" min="0" max="100" value="20" /></label>
+            <label>N (mg/kg): <input id="inp-n" type="number" step="0.1" min="0" max="200" value="10" /></label>
+            <label>P (mg/kg): <input id="inp-p" type="number" step="0.1" min="0" max="200" value="5" /></label>
+            <label>K (mg/kg): <input id="inp-k" type="number" step="0.1" min="0" max="200" value="10" /></label>
+        </div>
+
+        <div style="margin-top:12px;">
+            <button type="submit">Проанализировать</button>
+        </div>
+    </form>
+</div>
+
+<div id="soil-result"></div>
+
+<div class="card" style="margin-top:12px;">
+    <canvas id="soil-chart" height="120"></canvas>
+</div>
+
+<style>
+#soil-form label { display:inline-block; margin-right:8px; font-size:13px; }
+#soil-form input { padding:6px; border-radius:6px; border:1px solid #ddd; }
+</style>
