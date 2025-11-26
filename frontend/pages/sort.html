@@ -1,28 +1,21 @@
 <h2>Подбор сорта — подсветка района</h2>
-
 <div class="card">
-    <label>Культура:
-        <select id="crop-select">
-            <option value="пшеница">Пшеница</option>
-            <option value="ячмень">Ячмень</option>
-            <option value="подсолнечник">Подсолнечник</option>
-        </select>
-    </label>
-    <button id="crop-run" style="margin-left:8px;">Подобрать сорт и подсветить район</button>
+  <label>Культура:
+    <select id="crop-select">
+      <option value="пшеница">Пшеница</option>
+      <option value="ячмень">Ячмень</option>
+      <option value="подсолнечник">Подсолнечник</option>
+    </select>
+  </label>
+  <button id="crop-run" style="margin-left:8px;">Подобрать сорт и подсветить район</button>
 </div>
-
 <div class="card" style="padding:8px;">
-    <svg id="sort-map" viewBox="0 0 500 300" width="100%" height="240">
-        <rect id="d1" x="10" y="10" width="150" height="120" fill="#d6e9c6" stroke="#666" />
-        <rect id="d2" x="170" y="10" width="150" height="120" fill="#f7d6a5" stroke="#666" />
-        <rect id="d3" x="330" y="10" width="150" height="120" fill="#cfe2f3" stroke="#666" />
-        <rect id="d4" x="10" y="140" width="230" height="140" fill="#f1c0c0" stroke="#666" />
-        <rect id="d5" x="250" y="140" width="230" height="140" fill="#e2d5f7" stroke="#666" />
-    </svg>
+  <svg id="sort-map" viewBox="0 0 500 300" width="100%" height="240">
+    <rect id="d1" x="10" y="10" width="150" height="120" fill="#d6e9c6" stroke="#666"/>
+    <rect id="d2" x="170" y="10" width="150" height="120" fill="#f7d6a5" stroke="#666"/>
+    <rect id="d3" x="330" y="10" width="150" height="120" fill="#cfe2f3" stroke="#666"/>
+    <rect id="d4" x="10" y="140" width="230" height="140" fill="#f1c0c0" stroke="#666"/>
+    <rect id="d5" x="250" y="140" width="230" height="140" fill="#e2d5f7" stroke="#666"/>
+  </svg>
 </div>
-
 <div id="sort-info" style="margin-top:10px;"></div>
-
-<style>
-#sort-map rect { cursor:pointer; transition:fill-opacity .15s, stroke-width .15s; }
-</style>

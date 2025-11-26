@@ -1,25 +1,11 @@
 <h2>Окно возможностей — благоприятные дни</h2>
-
 <div class="card">
-    <label>Регион: <input id="region-input" value="Костанай" /></label>
-    <label style="margin-left:12px;">Период (дней): <input id="days-input" type="number" min="3" max="14" value="7" style="width:60px" /></label>
-    <button id="run-prog" style="margin-left:12px;">Найти лучшие дни</button>
+  <label>Регион: <input id="region-input" value="Костанай" /></label>
+  <label style="margin-left:12px;">Период (дней): <input id="days-input" type="number" min="3" max="14" value="7" style="width:70px" /></label>
+  <button id="run-prog" style="margin-left:12px;">Найти лучшие дни</button>
 </div>
-
 <div id="calendar-wrap" class="card">Календарь загрузится здесь...</div>
-
 <h3 style="margin-top:12px;">График температур</h3>
-<div class="card">
-    <canvas id="weather-chart" height="120"></canvas>
-</div>
-
+<div class="card"><canvas id="weather-chart" height="120"></canvas></div>
 <h3 style="margin-top:12px;">Список лучших дней</h3>
 <div id="favorable-list"></div>
-
-<style>
-.calendar { display:flex; gap:8px; flex-wrap:wrap; }
-.cal-day { width:100px; padding:8px; border-radius:8px; background:#fff; box-shadow:0 1px 4px rgba(0,0,0,0.06); text-align:center; cursor:default; }
-.cal-day.fav { background: linear-gradient(90deg,#e7fbda,#d0f5b0); border:2px solid #4caf50; }
-.cal-date { font-weight:600; margin-bottom:6px; }
-.cal-temp { color:#333; }
-</style>

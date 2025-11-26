@@ -1,5 +1,4 @@
 <h2>AgroSmart — Главное меню</h2>
-
 <div class="card" onclick="navigate('prognoz')">📅 Окно возможностей — прогноз и календарь</div>
 <div class="card" onclick="navigate('earts')">🌱 Анализ почвы — новый инструмент</div>
 <div class="card" onclick="navigate('sort')">🎯 Подбор сорта — подсветка района</div>
@@ -7,19 +6,17 @@
 
 <h3 style="margin-top:16px;">Интерактивная карта Костанайской области</h3>
 <div class="card" style="padding:8px;">
-    <!-- Упрощённая SVG-карта: каждый <path> — район с id d1..d5 -->
-    <svg id="kost-map" viewBox="0 0 500 300" width="100%" height="240">
-        <rect id="d1" x="10" y="10" width="150" height="120" fill="#d6e9c6" stroke="#666" />
-        <rect id="d2" x="170" y="10" width="150" height="120" fill="#f7d6a5" stroke="#666" />
-        <rect id="d3" x="330" y="10" width="150" height="120" fill="#cfe2f3" stroke="#666" />
-        <rect id="d4" x="10" y="140" width="230" height="140" fill="#f1c0c0" stroke="#666" />
-        <rect id="d5" x="250" y="140" width="230" height="140" fill="#e2d5f7" stroke="#666" />
-        <!-- подписи -->
-        <text x="25" y="30" font-size="12" fill="#333">Район А</text>
-        <text x="185" y="30" font-size="12" fill="#333">Район Б</text>
-        <text x="345" y="30" font-size="12" fill="#333">Район В</text>
-        <text x="25" y="160" font-size="12" fill="#333">Район Г</text>
-        <text x="260" y="160" font-size="12" fill="#333">Район Д</text>
-    </svg>
-    <div style="font-size:13px;margin-top:8px;color:#555;">Наведи на район — появится краткая информация. Клик — открыть анализ почвы для района.</div>
+  <svg id="kost-map" viewBox="0 0 500 300" width="100%" height="240">
+    <rect id="d1" x="10" y="10" width="150" height="120" fill="#d6e9c6" stroke="#666"/>
+    <rect id="d2" x="170" y="10" width="150" height="120" fill="#f7d6a5" stroke="#666"/>
+    <rect id="d3" x="330" y="10" width="150" height="120" fill="#cfe2f3" stroke="#666"/>
+    <rect id="d4" x="10" y="140" width="230" height="140" fill="#f1c0c0" stroke="#666"/>
+    <rect id="d5" x="250" y="140" width="230" height="140" fill="#e2d5f7" stroke="#666"/>
+    <text x="25" y="30" font-size="12" fill="#333">Район А</text>
+    <text x="185" y="30" font-size="12" fill="#333">Район Б</text>
+    <text x="345" y="30" font-size="12" fill="#333">Район В</text>
+    <text x="25" y="160" font-size="12" fill="#333">Район Г</text>
+    <text x="260" y="160" font-size="12" fill="#333">Район Д</text>
+  </svg>
+  <div style="font-size:13px;margin-top:8px;color:#555;">Наведи на район — появится краткая информация. Клик — открыть анализ почвы для района.</div>
 </div>
