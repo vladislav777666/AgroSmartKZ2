@@ -1,21 +1,32 @@
-<h2>Подбор сорта — подсветка района</h2>
-<div class="card">
-  <label>Культура:
-    <select id="crop-select">
-      <option value="пшеница">Пшеница</option>
-      <option value="ячмень">Ячмень</option>
-      <option value="подсолнечник">Подсолнечник</option>
-    </select>
-  </label>
-  <button id="crop-run" style="margin-left:8px;">Подобрать сорт и подсветить район</button>
+<button class="back btn-back">◀ Назад</button>
+<h2 style="margin-top:8px">Подбор сорта</h2>
+<div class="card row">
+  <label class="field col">Культура<select id="crop-select"><option value="пшеница">Пшеница</option><option value="ячмень">Ячмень</option><option value="подсолнечник">Подсолнечник</option></select></label>
+  <div style="display:flex;align-items:center"><button id="crop-run" class="btn">Найти и подсветить</button></div>
 </div>
-<div class="card" style="padding:8px;">
-  <svg id="sort-map" viewBox="0 0 500 300" width="100%" height="240">
-    <rect id="d1" x="10" y="10" width="150" height="120" fill="#d6e9c6" stroke="#666"/>
-    <rect id="d2" x="170" y="10" width="150" height="120" fill="#f7d6a5" stroke="#666"/>
-    <rect id="d3" x="330" y="10" width="150" height="120" fill="#cfe2f3" stroke="#666"/>
-    <rect id="d4" x="10" y="140" width="230" height="140" fill="#f1c0c0" stroke="#666"/>
-    <rect id="d5" x="250" y="140" width="230" height="140" fill="#e2d5f7" stroke="#666"/>
-  </svg>
+<div class="map-wrap">
+  <div class="map-area card">
+    <svg class="kazakh" viewBox="0 0 1200 800" preserveAspectRatio="xMidYMid meet">
+      <!-- копируем те же path'ы что и в main -->
+      <path id="r1" d="M240 120 L360 100 L410 160 L300 200 Z" />
+      <path id="r2" d="M430 140 L540 120 L600 200 L480 240 Z" />
+      <path id="r3" d="M680 130 L820 120 L900 200 L760 260 Z" />
+      <path id="r4" d="M860 270 L980 250 L1050 340 L900 380 Z" />
+      <path id="r5" d="M120 300 L240 280 L300 360 L180 420 Z" />
+      <path id="r6" d="M400 300 L540 280 L600 360 L460 400 Z" />
+      <path id="r7" d="M610 320 L730 310 L780 380 L650 420 Z" />
+      <path id="r8" d="M320 430 L440 420 L480 500 L340 540 Z" />
+      <path id="r9" d="M520 450 L640 440 L700 520 L560 560 Z" />
+      <path id="r10" d="M760 480 L880 460 L940 540 L800 600 Z" />
+      <path id="r11" d="M980 420 L1080 400 L1140 480 L1000 540 Z" />
+      <path id="r12" d="M160 540 L280 520 L330 600 L190 660 Z" />
+      <path id="r13" d="M360 620 L480 600 L540 680 L400 720 Z" />
+      <path id="r14" d="M580 640 L700 620 L760 700 L620 760 Z" />
+      <path id="r15" d="M820 620 L940 600 L1000 680 L860 740 Z" />
+      <path id="r16" d="M240 700 L340 680 L400 760 L260 780 Z" />
+      <path id="r17" d="M640 200 L740 180 L800 240 L700 260 Z" />
+    </svg>
+  </div>
+
+  <div style="width:340px"><div id="sort-info" class="card">Нажмите "Найти..."</div></div>
 </div>
-<div id="sort-info" style="margin-top:10px;"></div>

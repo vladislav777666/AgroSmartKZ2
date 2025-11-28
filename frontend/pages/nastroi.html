@@ -1,3 +1,14 @@
-<h2>Настройки</h2>
-<div class="card">Версия приложения: 1.0</div>
-<div class="card" onclick="navigate('main')">⬅️ Назад</div>
+<button class="back btn-back">◀ Назад</button>
+<h2 style="margin-top:8px">Профиль и подписка</h2>
+<div class="card">
+  <div id="profile-id" style="color:var(--muted);margin-bottom:8px"></div>
+  <div style="display:flex;gap:8px;align-items:center">
+    <button id="subscribe-btn" class="btn">Купить подписку — написать @Geniys666</button>
+    <button class="btn secondary" onclick="alert('Тестовая синхронизация профиля');">Синхр. профиль</button>
+  </div>
+</div>
+
+<div class="card">
+  <b>Система подписки</b>
+  <div style="color:var(--muted);margin-top:8px">Профили хранятся в Supabase (если настроено). При покупке подписки — сообщите @Geniys666.</div>
+</div>

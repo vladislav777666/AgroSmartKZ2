@@ -1,17 +1,17 @@
-<h2>Анализ почвы — версия 2</h2>
+<button class="back btn-back">◀ Назад</button>
+<h2 style="margin-top:8px">Анализ почвы — продвинутая</h2>
 <div class="card">
-  <div id="district-info" style="margin-bottom:8px;color:#333;"></div>
-  <form id="soil-form">
-    <div style="display:flex;gap:8px;flex-wrap:wrap;">
-      <label>pH: <input id="inp-ph" type="number" step="0.1" min="3" max="9" value="6.5"/></label>
-      <label>Органика (%) : <input id="inp-organic" type="number" step="0.1" min="0" max="40" value="5"/></label>
-      <label>Влажность (%) : <input id="inp-moisture" type="number" step="0.1" min="0" max="100" value="20"/></label>
-      <label>N (mg/kg): <input id="inp-n" type="number" step="0.1" min="0" max="200" value="10"/></label>
-      <label>P (mg/kg): <input id="inp-p" type="number" step="0.1" min="0" max="200" value="5"/></label>
-      <label>K (mg/kg): <input id="inp-k" type="number" step="0.1" min="0" max="200" value="10"/></label>
-    </div>
-    <div style="margin-top:12px;"><button type="submit">Проанализировать</button></div>
+  <div id="district-info" style="color:var(--muted);margin-bottom:8px"></div>
+  <form id="soil-form" class="row">
+    <label class="field col">pH<input id="inp-ph" type="number" step="0.1" min="3" max="9" value="6.5" /></label>
+    <label class="field col">Органика (%)<input id="inp-organic" type="number" step="0.1" min="0" max="40" value="5"/></label>
+    <label class="field col">Влажность (%)<input id="inp-moisture" type="number" step="0.1" min="0" max="100" value="20"/></label>
+    <label class="field col">N<input id="inp-n" type="number" step="0.1" min="0" max="200" value="10" /></label>
+    <label class="field col">P<input id="inp-p" type="number" step="0.1" min="0" max="200" value="5" /></label>
+    <label class="field col">K<input id="inp-k" type="number" step="0.1" min="0" max="200" value="10" /></label>
+    <div style="width:100%;margin-top:8px"><button type="submit" class="btn">Анализировать</button><button type="button" class="btn secondary" onclick="document.getElementById('soil-form').reset();">Сброс</button></div>
   </form>
 </div>
-<div id="soil-result"></div>
-<div class="card" style="margin-top:12px;"><canvas id="soil-chart" height="120"></canvas></div>
+<div id="soil-result" class="card"></div>
+<div class="card chart-wrap"><canvas id="soil-chart"></canvas></div>
+<div id="soil-steps" class="card"></div>

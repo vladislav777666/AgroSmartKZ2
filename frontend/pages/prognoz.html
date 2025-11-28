@@ -1,11 +1,10 @@
-<h2>Окно возможностей — благоприятные дни</h2>
-<div class="card">
-  <label>Регион: <input id="region-input" value="Костанай" /></label>
-  <label style="margin-left:12px;">Период (дней): <input id="days-input" type="number" min="3" max="14" value="7" style="width:70px" /></label>
-  <button id="run-prog" style="margin-left:12px;">Найти лучшие дни</button>
+<button class="back btn-back">◀ Назад</button>
+<h2 style="margin-top:8px">Окно возможностей — благоприятные дни</h2>
+<div class="card row">
+  <div class="col field"><label>Регион<input id="region-input" type="text" value="Костанай" /></label></div>
+  <div style="width:160px" class="field"><label>Период (дн)<input id="days-input" type="number" min="3" max="14" value="7" /></label></div>
+  <div style="display:flex;align-items:center"><button id="run-prog" class="btn">Найти</button></div>
 </div>
-<div id="calendar-wrap" class="card">Календарь загрузится здесь...</div>
-<h3 style="margin-top:12px;">График температур</h3>
-<div class="card"><canvas id="weather-chart" height="120"></canvas></div>
-<h3 style="margin-top:12px;">Список лучших дней</h3>
-<div id="favorable-list"></div>
+<div class="card chart-wrap"><canvas id="weather-chart"></canvas></div>
+<div id="calendar-wrap" class="card"></div>
+<div id="favorable-list" style="margin-top:10px"></div>

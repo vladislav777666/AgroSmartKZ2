@@ -1,213 +1,199 @@
-// helper to call backend (assumes CONFIG.API_URL points to Render base, without trailing slash)
+// API helpers
+const API_HOST = CONFIG.API_HOST;
+const API_PREFIX = API_HOST + "/api";
+
 async function apiGet(path){
-  const url = CONFIG.API_URL + "/api" + path;
-  const res = await fetch(url);
+  const res = await fetch(API_PREFIX + path);
+  if(!res.ok) throw new Error(await res.text());
+  return res.json();
+}
+async function apiPost(path, body){
+  const res = await fetch(API_PREFIX + path, {method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify(body)});
   if(!res.ok) throw new Error(await res.text());
   return res.json();
 }
 
-// authorize Mini App (only in Telegram WebApp)
+// Try auth with Telegram initData (if exists)
 async function authMiniApp(){
-  if(!window.Telegram || !window.Telegram.WebApp) return;
+  if(!(window.Telegram && window.Telegram.WebApp)) return;
   const tg = window.Telegram.WebApp;
   const initData = tg.initData || "";
-  if(!initData || initData.length < 10){
-    // nothing to do if opened outside Telegram or initData not provided
-    console.warn("No initData (not opened inside Telegram or empty).");
-    return;
-  }
+  if(!initData || initData.length < 8) return;
   try{
-    const res = await fetch(CONFIG.API_URL + "/api/auth?initData=" + encodeURIComponent(initData));
-    if(!res.ok) throw new Error(await res.text());
-    const j = await res.json();
-    console.log("Auth:", j);
+    await fetch(API_PREFIX + "/auth?initData=" + encodeURIComponent(initData));
+    console.log("Auth OK");
   }catch(e){
-    console.warn("Auth failed:", e);
+    console.warn("Auth failed", e);
   }
 }
 authMiniApp();
 
-// page loaders (main, prognoz, earts, sort, nastroi)
+// onPageLoad with interactive handlers
 window.onPageLoad = async function(page){
-  if(page === "main") {
-    // init map events (simple SVG rectangles with ids d1..d5)
-    const map = document.getElementById("kost-map");
-    if(!map) return;
-    const districts = {
-      d1:{name:"Район А",soil:"Суглинок",rec:"Внести азот"},
-      d2:{name:"Район Б",soil:"Песок",rec:"Полив"},
-      d3:{name:"Район В",soil:"Супесь",rec:"Органика"},
-      d4:{name:"Район Г",soil:"Чернозём",rec:"Подходит для пшеницы"},
-      d5:{name:"Район Д",soil:"Суглинок",rec:"Мелкие улучшения"}
-    };
-    let tooltip = document.getElementById("map-tooltip");
-    if(!tooltip){
-      tooltip = document.createElement("div");
-      tooltip.id = "map-tooltip";
-      Object.assign(tooltip.style,{position:"fixed",zIndex:9999,padding:"8px",borderRadius:"6px",background:"rgba(0,0,0,0.8)",color:"#fff",fontSize:"13px",display:"none",pointerEvents:"none"});
-      document.body.appendChild(tooltip);
-    }
-
-    Object.keys(districts).forEach(id=>{
-      const el = document.getElementById(id);
-      if(!el) return;
-      el.addEventListener("mouseenter", e=>{
-        el.setAttribute("fill-opacity","0.6");
-        const d = districts[id];
-        tooltip.innerHTML = `<b>${d.name}</b><br/>Тип почвы: ${d.soil}<br/>${d.rec}`;
-        tooltip.style.display = "block";
-      });
-      el.addEventListener("mousemove", e=>{
-        tooltip.style.left = (e.clientX + 12) + "px";
-        tooltip.style.top = (e.clientY + 12) + "px";
-      });
-      el.addEventListener("mouseleave", ()=>{
-        el.setAttribute("fill-opacity","1");
-        tooltip.style.display = "none";
-      });
-      el.addEventListener("click", ()=>{
-        sessionStorage.setItem("selectedDistrict", id);
-        navigate("earts");
-      });
-    });
+  function bindBack(){
+    document.querySelectorAll('.btn-back').forEach(b=>b.addEventListener('click', ()=>navigate('main')));
   }
 
+  if(page === "main"){
+    // Regions info (17 regions)
+    const REG = {
+      r1:{name:"Акмолинская", soil:"Суглинок/чернозём", crops:["пшеница","ячмень"]},
+      r2:{name:"Актюбинская", soil:"Супесь/песок", crops:["пшеница","подсолнечник"]},
+      r3:{name:"Атырауская", soil:"Песок/суглинок", crops:["подсолнечник"]},
+      r4:{name:"Алматинская", soil:"Чернозём", crops:["подсолнечник","пшеница"]},
+      r5:{name:"Актобе/область", soil:"Суглинок", crops:["пшеница"]},
+      r6:{name:"Костанайская", soil:"Суглинок", crops:["пшеница","ячмень"]},
+      r7:{name:"Павлодарская", soil:"Супесь", crops:["пшеница"]},
+      r8:{name:"Карагандинская", soil:"Супесь", crops:["ячмень"]},
+      r9:{name:"ВКО", soil:"Чернозём", crops:["подсолнечник"]},
+      r10:{name:"ЮКО/Туркестан", soil:"Чернозём", crops:["пшеница","подсолнечник"]},
+      r11:{name:"Жамбылская", soil:"Суглинок", crops:["пшеница"]},
+      r12:{name:"Кызылординская", soil:"Песок", crops:["подсолнечник"]},
+      r13:{name:"Мангыстау", soil:"Песок", crops:["подсолнечник"]},
+      r14:{name:"ЗКО", soil:"Суглинок", crops:["пшеница"]},
+      r15:{name:"СКО", soil:"Суглинок", crops:["пшеница"]},
+      r16:{name:"Абайская", soil:"Супесь", crops:["ячмень"]},
+      r17:{name:"Жетысу", soil:"Чернозём", crops:["пшеница"]}
+    };
+
+    // tooltip
+    let t = document.getElementById('map-tooltip');
+    if(!t){ t = document.createElement('div'); t.id='map-tooltip'; document.body.appendChild(t); Object.assign(t.style,{position:'fixed',display:'none',padding:'8px',borderRadius:'8px',background:'rgba(3,9,18,0.9)',color:'#e6f8ff',fontSize:'13px',zIndex:9999})}
+
+    Object.keys(REG).forEach(id=>{
+      const el = document.getElementById(id);
+      if(!el) return;
+      el.classList.add('region');
+      el.addEventListener('mouseenter', e=>{
+        t.innerHTML = `<b>${REG[id].name}</b><div style="color:var(--muted);margin-top:6px">Почва: ${REG[id].soil}<br>Рекомендуемые: ${REG[id].crops.join(', ')}</div>`;
+        t.style.display='block';
+      });
+      el.addEventListener('mousemove', e=>{ t.style.left=(e.clientX+12)+'px'; t.style.top=(e.clientY+12)+'px'; });
+      el.addEventListener('mouseleave', ()=> t.style.display='none');
+      el.addEventListener('click', async ()=>{
+        document.querySelectorAll('svg.kazakh .region').forEach(r=>r.classList.remove('active'));
+        el.classList.add('active');
+        const info = document.getElementById('region-info');
+        info.innerHTML = `<div class="region-info"><b>${REG[id].name}</b><div style="color:var(--muted);margin-top:8px">Почва: ${REG[id].soil}<br>Культуры: ${REG[id].crops.join(', ')}<br><div style="margin-top:8px"><button class="btn" onclick="navigate('earts'); sessionStorage.setItem('selectedRegion','${id}')">Открыть анализ</button></div></div></div>`;
+      });
+    });
+
+    bindBack();
+  }
+
+  // PROGNOZ (only favorable days + big chart)
   if(page === "prognoz"){
-    const runBtn = document.getElementById("run-prog");
-    const regionInput = document.getElementById("region-input");
-    const daysInput = document.getElementById("days-input");
-    const calendarWrap = document.getElementById("calendar-wrap");
-    const listWrap = document.getElementById("favorable-list");
-    const ctx = document.getElementById("weather-chart").getContext("2d");
+    bindBack();
+    const runBtn = document.getElementById('run-prog');
+    const regionInput = document.getElementById('region-input');
+    const daysInput = document.getElementById('days-input');
+    const calendarWrap = document.getElementById('calendar-wrap');
+    const listWrap = document.getElementById('favorable-list');
+    const canvas = document.getElementById('weather-chart');
+    canvas.height = 320;
     let chart;
 
-    function renderCalendar(dates, favSet){
-      const html = dates.map(d=>`<div class="cal-day ${favSet.has(d.iso)?'fav':''}" data-iso="${d.iso}"><div class="cal-date">${d.label}</div><div class="cal-temp">${d.temp===null?'-':d.temp+'°C'}</div></div>`).join('');
-      calendarWrap.innerHTML = `<div class="calendar">${html}</div>`;
+    function renderFavs(favs){
+      if(!favs || favs.length===0){ calendarWrap.innerHTML='<div class="card">Нет благоприятных дней</div>'; listWrap.innerHTML=''; if(chart){chart.destroy(); chart=null;} return; }
+      calendarWrap.innerHTML = favs.map(d=>`<div class="cal-item ${d.temp>=18 && d.temp<=22 ? 'good':''}"><div class="date">${d.date}</div><div class="meta">${d.temp}°C · ветер ${d.wind} м/с</div></div>`).join('');
+      listWrap.innerHTML = favs.map(d=>`<div class="card">${d.date} — ${d.temp}°C — ${d.wind} м/с</div>`).join('');
+      // chart
+      if(chart) chart.destroy();
+      const labels = favs.map(d=>d.date);
+      const temps = favs.map(d=>d.temp);
+      const winds = favs.map(d=>d.wind);
+      chart = new Chart(canvas.getContext('2d'), { type:'bar', data:{labels,datasets:[{label:'Температура °C', data:temps, backgroundColor:'rgba(11,132,255,0.7)'},{label:'Ветер м/с', data:winds, backgroundColor:'rgba(120,200,120,0.6)'}]}, options:{responsive:true, plugins:{legend:{labels:{color:'#e6eef7'}}}, scales:{y:{ticks:{color:'#e6eef7'}}}}});
     }
-    function renderList(fav){
-      if(!fav.length){ listWrap.innerHTML = `<div class="card">Нет благоприятных дней</div>`; return; }
-      listWrap.innerHTML = fav.map(d=>`<div class="card"><b>${d.label}</b> — ${d.temp}°C, ветер ${d.wind} м/с</div>`).join('');
-    }
+
     async function fetchAndRender(){
-      const region = encodeURIComponent(regionInput.value || "Костанай");
-      const days = Number(daysInput.value) || 7;
       try{
-        const data = await apiGet(`/window?region=${region}&days=${days}`);
-        // build range of days from today
-        const start = new Date();
-        const dates = Array.from({length: Math.max(days,7)}, (_,i)=>{
-          const d = new Date(start); d.setDate(start.getDate()+i);
-          const iso = d.toISOString().slice(0,10);
-          return {iso, label: iso.split('-').reverse().join('.'), temp: null, wind:null, rain:0};
-        });
-        const favSet = new Set();
-        (data.favorable_days||[]).forEach(x=>{
-          const parts = x.date.split('.');
-          const iso = `${parts[2]}-${parts[1]}-${parts[0]}`;
-          favSet.add(iso);
-          const dd = dates.find(z=>z.iso===iso);
-          if(dd){ dd.temp = x.temp; dd.wind = x.wind; dd.rain = x.rain||0; }
-        });
-        // chart
-        const labels = dates.map(d=>d.label);
-        const temps = dates.map(d=>d.temp===null?NaN:d.temp);
-        if(chart) chart.destroy();
-        chart = new Chart(ctx, {type:'line', data:{labels, datasets:[{label:'Темп °C', data:temps, tension:0.25, spanGaps:true}]}, options:{plugins:{legend:{display:false}}}});
-        renderCalendar(dates, favSet);
-        renderList(data.favorable_days||[]);
+        const region = encodeURIComponent(regionInput.value||'Костанай');
+        const days = Number(daysInput.value)||7;
+        const res = await apiGet(`/window?region=${region}&days=${days}`);
+        renderFavs(res.favorable_days || []);
       }catch(e){
         calendarWrap.innerHTML = `<div class="card">Ошибка: ${e.message}</div>`;
       }
     }
-
-    runBtn.addEventListener("click", fetchAndRender);
+    runBtn.addEventListener('click', fetchAndRender);
     await fetchAndRender();
   }
 
+  // EARTS (soil analysis)
   if(page === "earts"){
-    const form = document.getElementById("soil-form");
-    const inputs = {
-      ph: document.getElementById("inp-ph"),
-      organic: document.getElementById("inp-organic"),
-      moisture: document.getElementById("inp-moisture"),
-      n: document.getElementById("inp-n"),
-      p: document.getElementById("inp-p"),
-      k: document.getElementById("inp-k")
-    };
-    const resultBox = document.getElementById("soil-result");
-    const ctx = document.getElementById("soil-chart").getContext("2d");
-    let barChart;
+    bindBack();
+    const form = document.getElementById('soil-form');
+    const inputs = { ph: document.getElementById('inp-ph'), organic: document.getElementById('inp-organic'), moisture: document.getElementById('inp-moisture'), n: document.getElementById('inp-n'), p: document.getElementById('inp-p'), k: document.getElementById('inp-k') };
+    const resultBox = document.getElementById('soil-result'); const canvas = document.getElementById('soil-chart'); canvas.height = 360;
+    let chart;
 
-    function compute(values){
-      const phScore = Math.max(0,100 - Math.abs(6.5 - values.ph)*15);
-      const organicScore = Math.min(100, values.organic*2.5);
-      const moistureScore = Math.min(100, values.moisture*2);
-      const nScore = Math.min(100, values.n*1.2);
-      const pScore = Math.min(100, values.p*1.2);
-      const kScore = Math.min(100, values.k*1.2);
-      const total = Math.round(phScore*0.25 + organicScore*0.2 + moistureScore*0.15 + nScore*0.15 + pScore*0.12 + kScore*0.13);
-      return {total, breakdown:{phScore:Math.round(phScore), organicScore:Math.round(organicScore), moistureScore:Math.round(moistureScore), nScore:Math.round(nScore), pScore:Math.round(pScore), kScore:Math.round(kScore)}};
-    }
-    function render(values){
-      const {total,breakdown} = compute(values);
-      let rec = "Состояние удовлетворительное.";
-      if(total<45) rec="Почва бедная: внесите органику и N.";
-      else if(total<70) rec="Средняя плодородность: добавьте органику, следите за влажностью.";
-      resultBox.innerHTML = `<div class="card"><h3>Итог: ${total}/100</h3><p>${rec}</p><ul><li>pH: ${breakdown.phScore}</li><li>Органика: ${breakdown.organicScore}</li><li>Влажность: ${breakdown.moistureScore}</li><li>N: ${breakdown.nScore}</li><li>P: ${breakdown.pScore}</li><li>K: ${breakdown.kScore}</li></ul></div>`;
-      const labels = ["pH","Органика","Влажность","N","P","K"];
-      const data = [breakdown.phScore,breakdown.organicScore,breakdown.moistureScore,breakdown.nScore,breakdown.pScore,breakdown.kScore];
-      if(barChart) barChart.destroy();
-      barChart = new Chart(ctx,{type:'bar',data:{labels,datasets:[{label:'Показатели',data}]},options:{plugins:{legend:{display:false}},scales:{y:{min:0,max:100}}}});
+    function compute(vals){
+      const phScore = Math.max(0,100 - Math.abs(6.5 - vals.ph)*20);
+      const organicScore = Math.min(100,(vals.organic/8)*100);
+      const moistureScore = Math.max(0,100 - Math.abs(26 - vals.moisture)*3);
+      const nScore = Math.min(100,(vals.n/60)*100);
+      const pScore = Math.min(100,(vals.p/20)*100);
+      const kScore = Math.min(100,(vals.k/150)*100);
+      const total = Math.round(phScore*0.20 + organicScore*0.20 + moistureScore*0.15 + nScore*0.15 + pScore*0.15 + kScore*0.15);
+      const issues=[];
+      if(vals.ph<5.5) issues.push("низкий pH: известкование");
+      if(vals.ph>7.5) issues.push("высокий pH: учесть доступность P");
+      if(vals.organic<3) issues.push("мало органики");
+      if(vals.moisture<12) issues.push("сухо — полив");
+      if(vals.n<20) issues.push("низкий N");
+      if(vals.p<8) issues.push("низкий P");
+      if(vals.k<50) issues.push("низкий K");
+      return {total, breakdown:{phScore:Math.round(phScore), organicScore:Math.round(organicScore), moistureScore:Math.round(moistureScore), nScore:Math.round(nScore), pScore:Math.round(pScore), kScore:Math.round(kScore)}, issues};
     }
 
-    function read(){
-      return {
-        ph: parseFloat(inputs.ph.value) || 6.5,
-        organic: parseFloat(inputs.organic.value) || 5,
-        moisture: parseFloat(inputs.moisture.value) || 20,
-        n: parseFloat(inputs.n.value) || 10,
-        p: parseFloat(inputs.p.value) || 5,
-        k: parseFloat(inputs.k.value) || 10
-      };
+    function render(vals){
+      const r = compute(vals);
+      resultBox.innerHTML = `<div class="card"><div style="display:flex;gap:12px"><div style="width:120px;height:120px;border-radius:12px;background:linear-gradient(180deg,#072233,#073046);display:flex;align-items:center;justify-content:center;font-size:22px;font-weight:700">${r.total}</div><div style="flex:1"><b>Рекомендации</b><div style="color:var(--muted);margin-top:8px">${r.issues.length?'<ul>'+r.issues.map(i=>`<li>${i}</li>`).join('')+'</ul>':'Параметры в норме'}</div></div></div></div>`;
+      const labels=["pH","Органика","Влажность","N","P","K"];
+      const data=[r.breakdown.phScore,r.breakdown.organicScore,r.breakdown.moistureScore,r.breakdown.nScore,r.breakdown.pScore,r.breakdown.kScore];
+      if(chart) chart.destroy();
+      chart = new Chart(canvas.getContext('2d'), {type:'radar', data:{labels,datasets:[{label:'показатели',data,backgroundColor:'rgba(11,132,255,0.14)',borderColor:'rgba(11,132,255,0.9)'}]}, options:{scales:{r:{pointLabels:{color:'#e6eef7'}}}, plugins:{legend:{display:false}}}});
     }
 
-    Object.values(inputs).forEach(inp=>inp.addEventListener("input", ()=>render(read())));
-    form.addEventListener("submit", e=>{ e.preventDefault(); render(read()); });
-
-    const selected = sessionStorage.getItem("selectedDistrict");
-    if(selected) document.getElementById("district-info").innerText = `Выбран район: ${selected}`;
-    render(read());
+    Object.values(inputs).forEach(i=>i.addEventListener('input', ()=>render({ph:parseFloat(inputs.ph.value),organic:parseFloat(inputs.organic.value),moisture:parseFloat(inputs.moisture.value),n:parseFloat(inputs.n.value),p:parseFloat(inputs.p.value),k:parseFloat(inputs.k.value)})));
+    form.addEventListener('submit', async e=>{ e.preventDefault(); const vals={ph:parseFloat(inputs.ph.value),organic:parseFloat(inputs.organic.value),moisture:parseFloat(inputs.moisture.value),n:parseFloat(inputs.n.value),p:parseFloat(inputs.p.value),k:parseFloat(inputs.k.value)}; render(vals); try{ await apiPost('/save_soil', {user_id: window.Telegram && window.Telegram.WebApp ? (window.Telegram.WebApp.initDataUnsafe && window.Telegram.WebApp.initDataUnsafe.user ? window.Telegram.WebApp.initDataUnsafe.user.id : null) : null, region: sessionStorage.getItem('selectedRegion')||'unknown', values: vals}); }catch(err){ console.warn('Save soil failed', err) } });
+    const sel = sessionStorage.getItem('selectedRegion'); if(sel) document.getElementById('district-info').innerText = 'Выбран район: ' + sel;
+    render({ph:6.5,organic:5,moisture:20,n:10,p:5,k:10});
+    bindBack();
   }
 
+  // SORT
   if(page === "sort"){
-    const cropSelect = document.getElementById("crop-select");
-    const btn = document.getElementById("crop-run");
-    const info = document.getElementById("sort-info");
-    const districtIds = ["d1","d2","d3","d4","d5"];
-    function clear(){
-      districtIds.forEach(id=>{
-        const el = document.getElementById(id);
-        if(el){ el.setAttribute("stroke","#666"); el.setAttribute("stroke-width","1"); }
-      });
-    }
-    btn.addEventListener("click", async ()=>{
-      const crop = cropSelect.value || "пшеница";
+    bindBack();
+    const PREFER = {
+      "пшеница":["r6","r15","r1","r8"],
+      "ячмень":["r8","r16","r6"],
+      "подсолнечник":["r4","r9","r12"]
+    };
+    const cropSelect = document.getElementById('crop-select');
+    const runBtn = document.getElementById('crop-run');
+    const info = document.getElementById('sort-info');
+
+    runBtn.addEventListener('click', async ()=>{
+      const crop = cropSelect.value;
+      document.querySelectorAll('svg.kazakh .region').forEach(r=>{ r.classList.remove('prefer'); r.classList.remove('active'); r.setAttribute('stroke','#123141'); r.setAttribute('stroke-width','1'); });
+      (PREFER[crop]||[]).forEach(id=>{ const el = document.getElementById(id); if(el){ el.classList.add('prefer'); el.setAttribute('stroke','#a7ffcb'); el.setAttribute('stroke-width','2'); }});
       try{
         const res = await apiGet(`/sort?region=Костанай&crop=${encodeURIComponent(crop)}`);
-        clear();
-        const rnd = districtIds[Math.floor(Math.random()*districtIds.length)];
-        const el = document.getElementById(rnd);
-        if(el){ el.setAttribute("stroke","#0b84ff"); el.setAttribute("stroke-width","3"); el.setAttribute("fill-opacity","0.7"); }
-        info.innerHTML = `<div class="card"><b>Культура:</b> ${res.crop}<br/><b>Рекомендуемый сорт:</b> ${res.recommended_variety}<br/><b>Характеристики:</b> ${res.features}</div>`;
+        info.innerHTML = `<div class="card"><b>Культура:</b> ${crop}<br><b>Сорт:</b> ${res.recommended_variety}<div style="color:var(--muted);margin-top:8px">${res.features}</div></div>`;
       }catch(e){
-        info.innerHTML = `<div class="card">Ошибка: ${e.message}</div>`;
+        info.innerHTML = `<div class="card">Ошибка получения сорта: ${e.message}</div>`;
       }
     });
   }
 
+  // NASTROI (profile & subscription)
   if(page === "nastroi"){
-    const el = document.getElementById("nastroi-box");
-    if(el) el.innerHTML = `<div class="card">Настройки: язык, профиль, экспорт.</div>`;
+    bindBack();
+    const btn = document.getElementById('subscribe-btn');
+    const userId = window.Telegram && window.Telegram.WebApp && window.Telegram.WebApp.initDataUnsafe && window.Telegram.WebApp.initDataUnsafe.user ? window.Telegram.WebApp.initDataUnsafe.user.id : null;
+    document.getElementById('profile-id').innerText = userId ? `Ваш Telegram ID: ${userId}` : 'ID: неизвестен (открой в Telegram)';
+    btn.addEventListener('click', ()=>{ alert('Чтобы оформить подписку напиши @Geniys666 (вручную)'); });
   }
 };
+// Router

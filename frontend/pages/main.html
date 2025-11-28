@@ -1,22 +1,65 @@
-<h2>AgroSmart — Главное меню</h2>
-<div class="card" onclick="navigate('prognoz')">📅 Окно возможностей — прогноз и календарь</div>
-<div class="card" onclick="navigate('earts')">🌱 Анализ почвы — новый инструмент</div>
-<div class="card" onclick="navigate('sort')">🎯 Подбор сорта — подсветка района</div>
-<div class="card" onclick="navigate('nastroi')">⚙️ Настройки</div>
+<div class="header">
+  <div class="brand">
+    <div class="logo">AS</div>
+    <div>
+      <div class="title">AgroSmart</div>
+      <div style="font-size:12px;color:var(--muted)">Интерактивная карта Казахстана — выберите регион</div>
+    </div>
+  </div>
+  <div style="margin-left:auto">
+    <button class="btn" onclick="navigate('prognoz')">Окно возможностей</button>
+    <button class="btn secondary" onclick="navigate('earts')">Анализ почвы</button>
+    <button class="btn secondary" onclick="navigate('sort')">Подбор сорта</button>
+  </div>
+</div>
 
-<h3 style="margin-top:16px;">Интерактивная карта Костанайской области</h3>
-<div class="card" style="padding:8px;">
-  <svg id="kost-map" viewBox="0 0 500 300" width="100%" height="240">
-    <rect id="d1" x="10" y="10" width="150" height="120" fill="#d6e9c6" stroke="#666"/>
-    <rect id="d2" x="170" y="10" width="150" height="120" fill="#f7d6a5" stroke="#666"/>
-    <rect id="d3" x="330" y="10" width="150" height="120" fill="#cfe2f3" stroke="#666"/>
-    <rect id="d4" x="10" y="140" width="230" height="140" fill="#f1c0c0" stroke="#666"/>
-    <rect id="d5" x="250" y="140" width="230" height="140" fill="#e2d5f7" stroke="#666"/>
-    <text x="25" y="30" font-size="12" fill="#333">Район А</text>
-    <text x="185" y="30" font-size="12" fill="#333">Район Б</text>
-    <text x="345" y="30" font-size="12" fill="#333">Район В</text>
-    <text x="25" y="160" font-size="12" fill="#333">Район Г</text>
-    <text x="260" y="160" font-size="12" fill="#333">Район Д</text>
-  </svg>
-  <div style="font-size:13px;margin-top:8px;color:#555;">Наведи на район — появится краткая информация. Клик — открыть анализ почвы для района.</div>
+<div class="card map-wrap">
+  <div class="map-area">
+    <!-- Упрощённый SVG Казахстана — 17 регионов (идентификаторы r1..r17) -->
+    <svg class="kazakh" viewBox="0 0 1200 800" preserveAspectRatio="xMidYMid meet">
+      <!-- Это упрощённые формы, можно заменить на точные path'ы -->
+      <path id="r1" d="M240 120 L360 100 L410 160 L300 200 Z" />
+      <path id="r2" d="M430 140 L540 120 L600 200 L480 240 Z" />
+      <path id="r3" d="M680 130 L820 120 L900 200 L760 260 Z" />
+      <path id="r4" d="M860 270 L980 250 L1050 340 L900 380 Z" />
+      <path id="r5" d="M120 300 L240 280 L300 360 L180 420 Z" />
+      <path id="r6" d="M400 300 L540 280 L600 360 L460 400 Z" />
+      <path id="r7" d="M610 320 L730 310 L780 380 L650 420 Z" />
+      <path id="r8" d="M320 430 L440 420 L480 500 L340 540 Z" />
+      <path id="r9" d="M520 450 L640 440 L700 520 L560 560 Z" />
+      <path id="r10" d="M760 480 L880 460 L940 540 L800 600 Z" />
+      <path id="r11" d="M980 420 L1080 400 L1140 480 L1000 540 Z" />
+      <path id="r12" d="M160 540 L280 520 L330 600 L190 660 Z" />
+      <path id="r13" d="M360 620 L480 600 L540 680 L400 720 Z" />
+      <path id="r14" d="M580 640 L700 620 L760 700 L620 760 Z" />
+      <path id="r15" d="M820 620 L940 600 L1000 680 L860 740 Z" />
+      <path id="r16" d="M240 700 L340 680 L400 760 L260 780 Z" />
+      <path id="r17" d="M640 200 L740 180 L800 240 L700 260 Z" />
+      <!-- Labels (for readability) -->
+      <text x="300" y="150" fill="#bfeaff" font-size="12">Акмолинская</text>
+      <text x="500" y="150" fill="#bfeaff" font-size="12">Актюбинская</text>
+      <text x="780" y="150" fill="#bfeaff" font-size="12">Атырауская</text>
+      <text x="980" y="300" fill="#bfeaff" font-size="12">Алматинская</text>
+      <text x="120" y="320" fill="#bfeaff" font-size="12">Запад</text>
+      <text x="480" y="320" fill="#bfeaff" font-size="12">Костанай</text>
+      <text x="700" y="330" fill="#bfeaff" font-size="12">Павлодар</text>
+      <text x="380" y="460" fill="#bfeaff" font-size="12">Караганда</text>
+      <text x="600" y="480" fill="#bfeaff" font-size="12">ВКО</text>
+      <text x="860" y="520" fill="#bfeaff" font-size="12">Юг</text>
+      <text x="1020" y="460" fill="#bfeaff" font-size="12">Жамбыл</text>
+      <text x="180" y="560" fill="#bfeaff" font-size="12">Кызылорда</text>
+      <text x="440" y="640" fill="#bfeaff" font-size="12">Мангыстау</text>
+      <text x="660" y="680" fill="#bfeaff" font-size="12">Жетысу</text>
+      <text x="920" y="680" fill="#bfeaff" font-size="12">СКО</text>
+      <text x="260" y="720" fill="#bfeaff" font-size="12">Атырау-2</text>
+      <text x="720" y="230" fill="#bfeaff" font-size="12">Абай</text>
+    </svg>
+  </div>
+
+  <div style="width:360px">
+    <div id="region-info" class="region-info card">
+      <b>Информация о регионе</b>
+      <div style="margin-top:8px;color:var(--muted)">Наведите или кликните на область карты, чтобы увидеть тип почвы, рекомендованные культуры и быстрые шаги.</div>
+    </div>
+  </div>
 </div>
